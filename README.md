@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# yarn 설치 및 활용
 
-## Getting Started
+- npm 대비 안정적이고 속도가 빠르다.
+- `npm install -g yarn`
+- `yarn --version-`
+- `yarn add 패키지명`
+- `yarn install` : node_modules 를 설치
 
-First, run the development server:
+# Next.js
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- [Next.js](https://nextjs.org/)
+- [DOC](https://nextjs.org/docs)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 1. 프로젝트 생성
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `npx create-next-app@13.5.6` (1차 실습)
+- `npx create-next-app@latest` (최신버전 14버전)
+- Yes : typeScript , /src , App router , EsLint
+- No : TailWind , alias
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## 2. 프로젝트 실행
 
-## Learn More
+- yarn dev 또는 npm dev
+- localhost:3000 실행
+- 참고로 SSR 방식 (서버가 있어야 한다.)
+  : Server Side Rendering (Next)
+  : JS가 작동안되도 화면은 출력(HTML/CSS)
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- 참고로 CSR 방식 : Client Side Rendering (React)
+  : JS 가 작동안되면 화면출력이 안됨
