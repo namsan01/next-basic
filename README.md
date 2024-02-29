@@ -5,7 +5,7 @@
 - app/page.tsx
   : 루트 페이지
 
-```tsxs
+```tsx
 export default function Home() {
   return (
     <>
@@ -22,6 +22,7 @@ export default function Home() {
 }
 ```
 
+- 정적 라우팅(static router)
 - app/detail 폴더 / page.tsx 파일생성
 
 ```tsx
@@ -34,6 +35,7 @@ const page = () => {
 export default page;
 ```
 
+- 동적 라우팅 (Dynamic Router)
 - app/detail/[city] 폴더생성 / page.tsx 파일생성
   : http://localhost:3000/detail/daegu
   : http://localhost:3000/detail/busan
@@ -117,6 +119,10 @@ const page = ({ params }: Props) => {
 export default page;
 ```
 
+- 참고사항
+  : next.js 는 Server 의 콘솔(터미널)확인
+  :console.log 활용시 터미널에서 확인
+
 useRouter 활용하기
 : use 는 hook이다
 : 이벤트 헨들러 활용
@@ -158,7 +164,7 @@ export default Detail;
 ```
 
 - 버튼을 컴포넌트로 만들기
-  : 이유는 Next.js 는 client component 는 컴포넌트 만들길 추천
+  : 이유 : Next.js 는 client component 는 컴포넌트 만들길 추천
   : "use client" 사용한것은 가능하면 컴포넌트
   : /app/components/폴더생성
   : /app/components/HomeButton.tsx
@@ -303,3 +309,324 @@ button {
 ```tsx
 <ul className={styles.list}>
 ```
+
+- API 백엔드 서버 연동
+  : [REST OPEN API](https://jsonplaceholder.typicode.com/)
+  : 전체목록 : https://jsonplaceholder.typicode.com/todos
+
+: Type 만들기
+
+- 손으로 작업하기
+
+```json
+{
+  "userId": 10,
+  "id": 200,
+  "title": "ipsam aperiam voluptates qui",
+  "completed": false
+}
+```
+
+```ts
+export type TodoType = {
+  userId: number;
+  id: number;
+  title: string;
+  completed: boolean;
+};
+```
+
+- ChatGPT 작업하기
+
+```txt
+  {
+    "userId": 10,
+    "id": 200,
+    "title": "ipsam aperiam voluptates qui",
+    "completed": false
+  }   타입스크립트 타입으로 만들어줘
+```
+
+- 서비스 사이트 이용해서 작업하기
+  : https://transform.tools/json-to-typescript
+
+```ts
+export interface Root {
+  userId: number;
+  id: number;
+  title: string;
+  completed: boolean;
+}
+```
+
+- Next.js 내장된 fetch API 사용하기
+  : React Query 처럼 생겼다.
+  : app/page.tsx
+
+```tsx
+import Link from "next/link";
+import styles from "@/app/styles/style.module.css";
+
+// Open API 호출하기
+const getTodoList = async () => {
+  // Next.js에 내부 함수
+  // 전체 목록
+  const res = await fetch("https://jsonplaceholder.typicode.com/todos");
+  console.log(res);
+  return res.json;
+};
+
+export default async function Home() {
+  const res = await getTodoList();
+  console.log("받은데이터", res);
+
+  return (
+    <>
+      <h1>첫페이지</h1>
+      <ul className={styles.list}>
+        <li>
+          <Link href={"/detail/daegu"}>대구</Link>
+        </li>
+        <li>
+          <Link href={"/detail/busan"}>부산</Link>
+        </li>
+        <li>
+          <Link href={"/detail/daegun"}>대전</Link>
+        </li>
+        <li>
+          <Link href={"/detail/gwangju"}>광주</Link>
+        </li>
+        <li>
+          <Link href={"/detail/seoul"}>서울</Link>
+        </li>
+        <li>
+          <Link href={"/detail/jeju"}>제주</Link>
+        </li>
+      </ul>
+    </>
+  );
+}
+```
+
+- Next.js 에러 페이지 만들기
+  : https://nextjs.org/docs/getting-started/project-structure
+  : /app/error.tsx 생성 (약속이 된 파일명)
+
+```tsx
+"use client";
+
+import { useEffect } from "react";
+
+type Props = {
+  error: Error;
+  reset: () => void;
+};
+const Error = ({ error, reset }: Props) => {
+  useEffect(() => {
+    console.log(error.message);
+  });
+  return (
+    <>
+      <h1>에러 페이지입니다. {error.message}</h1>
+      <button
+        onClick={() => {
+          reset();
+        }}
+      >
+        새로고침
+      </button>
+    </>
+  );
+};
+
+export default Error;
+```
+
+- 데이터의 타입을 정의하자
+  : /app/type 폴더 만들기
+  : /app/type/TodoType.ts
+
+```ts
+export interface Todo {
+  userId: number;
+  id: number;
+  title: string;
+  completed: boolean;
+}
+```
+
+: /app/page.tsx
+
+```tsx
+<div>
+  {res.map((item: Todo) => (
+    <div key={item.id}>
+      Id: {item.userId} : {item.title}
+    </div>
+  ))}
+</div>
+```
+
+- Todo 상세페이지 이동하기
+  : /app/todos 폴더 만들기
+  : /app/todos/[id] 폴더 만들기
+  : /app/todos/[id]/page.tsx 폴더 만들기
+
+```ts
+import React from "react";
+type Props = {
+  params: {
+    id: string;
+  };
+};
+// Next.js 의 fetch 사용
+
+// Open API 호출하기
+const getTodoDetail = async (id: string) => {
+  const res = await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`);
+  if (res.status !== 200) {
+    throw new Error("상세 할일 정보를 가지고 오는데 실패하였습니다.");
+  } else {
+    return res.json();
+  }
+};
+
+const TodoDetail = async ({ params }: Props) => {
+  const res = await getTodoDetail(params.id);
+  console.log(res);
+  return (
+    <div>
+      할일 상세페이지 {res.id} : {res.title}{" "}
+    </div>
+  );
+};
+
+export default TodoDetail;
+```
+
+- 로딩창 생성하기
+  : /app/loading.tsx 파일 생성
+
+```tsx
+import React from "react";
+
+const Loading = () => {
+  return <h1>로딩중입니다</h1>;
+};
+
+export default Loading;
+```
+
+- 환경변수 파일 생성하기
+  : 숨겨야 하는 정보 (API 키 , 지도 키 , FB 키 등)
+  : 반드시 / 생성함
+  : .env.local 생성
+  : 서버를 재실행
+  : React 와 Next는 접두어가 다르다.
+
+```txt
+  NEXT_PUBLIC_API_URL= https://jsonplaceholder.typicode.com
+```
+
+: app/page.tsx
+
+```tsx
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+const res = await fetch(`${API_URL}/todos`);
+```
+
+:/app/todos/[id]/page.tsx
+
+```tsx
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+const res = await fetch(`${API_URL}/todos/${id}`);
+```
+
+- 혼자서 연습해보기
+  : 랜덤 고양이 API [https://thecatapi.com/]
+  : 지브리 API [https://ghibliapi.vercel.app/]
+  : 날씨 API [https://www.weatherapi.com/]
+  : 포켓몬 API [https://pokeapi.co/]
+
+- MetaData 적용하기 1. (정적 Static )
+
+```tsx
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "타이틀 - 연습",
+  description: "연습하고 있습니다. ^^",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="ko">
+      <body className={inter.className}>{children}</body>
+    </html>
+  );
+}
+```
+
+- MetaData 적용하기 2. (동적 Dynamic )
+  : /app/detail/[city]/page.tsx
+
+  ```tsx
+  export function generateMetadata({ params }: Props) {
+    return {
+      title: `새로운 타이틀 - ${params.city}`,
+      description: `${params.city} : 연습하고 있습니다. ^^`,
+    };
+  }
+  ```
+
+- MetaData 적용하기 3. (동적 Dynamic : SearchParams 활용 )
+
+```tsx
+import style from "@/app/styles/detail.module.css";
+import HomeButton from "@/components/HomeButton";
+
+type Props = {
+  params: {
+    city: string;
+  };
+  searchParams: {
+    cityName: string;
+  };
+};
+// 동적 MetaData
+export function generateMetadata({ params, searchParams }: Props) {
+  return {
+    title: `새로운 타이틀 - ${searchParams.cityName}`,
+    description: `${params.city} : 연습하고 있습니다. ^^`,
+  };
+}
+
+const Detail = ({ params, searchParams }: Props) => {
+  // const cityName = params.city === "daegu" ? "대구" : params.city;
+  return (
+    <>
+      <div className={style.detailTitle}>
+        상세내용 : {searchParams.cityName}
+      </div>
+
+      <HomeButton />
+    </>
+  );
+};
+
+export default Detail;
+```
+
+- 배포하기 (Deploy)
+  : 인터넷 주소로 접근
+  : [https://vercel.com]
